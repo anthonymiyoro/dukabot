@@ -23,6 +23,7 @@ postback_button = elements.PostbackButton(
    title='Start chatting',
    payload='USER_DEFINED_PAYLOAD'
 )
+
 template = templates.ButtonTemplate(
    text='What do you want to do next?',
    buttons=[
@@ -31,6 +32,26 @@ template = templates.ButtonTemplate(
 )
 
 attachment = attachments.TemplateAttachment(template=template)
+
+# # Send button template 2
+# web_button2 = elements.WebUrlButton(
+#   title="I'm a buyer",
+#   url='https://petersapparel.parseapp.com'
+# )
+# postback_button2 = elements.PostbackButton(
+#   title='I have something to sell',
+#   payload='USER_DEFINED_PAYLOAD'
+# )
+
+# template = templates.ButtonTemplate(
+#   text='Which are you?',
+#   buttons=[
+#       web_button2, postback_button2
+#   ]
+# )
+
+attachment = attachments.TemplateAttachment(template=template)
+
 
 @csrf_exempt
 def webhook(request):
@@ -42,7 +63,7 @@ def webhook(request):
             return HttpResponse('Error, invalid token')
     try:
         output = json.loads(request.body.decode('utf-8'))
-        print output
+        print (output)
         try:
             for event in output['entry']:
                 messaging = event['messaging']
@@ -50,18 +71,20 @@ def webhook(request):
                     recipient_id = x['sender']['id']
                     recipient = messages.Recipient(recipient_id=recipient_id)
                     if x.get('message'):
-
+                        # collect text
                         if x['message'].get('text'):
                             message_text = x['message']['text']
+                        # ask if they want to buy something
+                            message = messages.Message(text='Hello, do you wish to buy or sell a product?')
+                            request = messages.MessageRequest(recipient, message)
+                            messenger.send(request)
                             if message_text == 'hi':
                                 message = messages.Message(attachment=attachment)
-                                # bot.send_text_message(recipient_id, message)
                                 request = messages.MessageRequest(recipient, message)
                                 messenger.send(request)
                         if x['message'].get('attachments'):
                             for att in x['message'].get('attachments'):
                                 pass
-                                # bot.send_attachment_url(recipient_id, att['type'], att['payload']['url'])
                     elif x.get('postback').get('payload') == 'USER_DEFINED_PAYLOAD':
                         message = messages.Message(text='Hello World')
                         request = messages.MessageRequest(recipient, message)
@@ -73,24 +96,3 @@ def webhook(request):
         print e
     return HttpResponse()
 
-
-# class fb_senderView(generic.View):
-#     @method_decorator(csrf_exempt)
-#     def dispatch(self, request, *args, **kwargs):
-#         return generic.View.dispatch(self, request, *args, **kwargs)
-#
-#     def get(self, request, *args, **kwargs):
-#         if self.request.GET['hub.verify_token'] == '555777':
-#             return HttpResponse(self.request.GET['hub.challenge'])
-#         else:
-#             return HttpResponse('Error, invalid token')
-#
-#         def post(self, request, *args, **kwargs):
-#             #Convert incoming text into a python dictionary
-#             incoming_message = json.loads(self.request.body.decode('utf-8'))
-#             #Goes through multiple messages if received at once
-#             for entry in incoming_message['entry']:
-#                 for message in entry['message']:
-#                 if 'message' in message:
-#                     pprint(message)
-#             return HttpResponse()
