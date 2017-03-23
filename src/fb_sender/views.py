@@ -31,45 +31,46 @@ template = templates.ButtonTemplate(
 )
 
 attachment = attachments.TemplateAttachment(template=template)
-@csrf_exempt
-def verify(request, self=None):
-	if self.request.GET['hub.verify_token'] == '555777':
-		    return HttpResponse(self.request.GET['hub.challenge'])
-	else:
-            return HttpResponse('Error, invalid token')
 
 @csrf_exempt
 def webhook(request):
 
-    output = json.loads(request.body)
-    print output
-    try:
-        for event in output['entry']:
-            messaging = event['messaging']
-            for x in messaging:
-                recipient_id = x['sender']['id']
-                recipient = messages.Recipient(recipient_id=recipient_id)
-                if x.get('message'):
+    if request.GET:
+        if request.GET['hub.verify_token'] == '555777':
+            return HttpResponse(request.GET['hub.challenge'])
+        else:
+            return HttpResponse('Error, invalid token')
 
-                    if x['message'].get('text'):
-                        message_text = x['message']['text']
-                        if message_text == 'hi':
-                            message = messages.Message(attachment=attachment)
-                            # bot.send_text_message(recipient_id, message)
-                            request = messages.MessageRequest(recipient, message)
-                            messenger.send(request)
-                    if x['message'].get('attachments'):
-                        for att in x['message'].get('attachments'):
-                            pass
-                            # bot.send_attachment_url(recipient_id, att['type'], att['payload']['url'])
-                elif x.get('postback').get('payload')=='USER_DEFINED_PAYLOAD':
-                    message = messages.Message(text='Hello World')
-                    request = messages.MessageRequest(recipient, message)
-                    messenger.send(request)
-                    pass
-    except Exception, e:
-        print e.message
-    return HttpResponse()
+    if request.POST:
+        output = json.loads(request.body)
+        print output
+        try:
+            for event in output['entry']:
+                messaging = event['messaging']
+                for x in messaging:
+                    recipient_id = x['sender']['id']
+                    recipient = messages.Recipient(recipient_id=recipient_id)
+                    if x.get('message'):
+
+                        if x['message'].get('text'):
+                            message_text = x['message']['text']
+                            if message_text == 'hi':
+                                message = messages.Message(attachment=attachment)
+                                # bot.send_text_message(recipient_id, message)
+                                request = messages.MessageRequest(recipient, message)
+                                messenger.send(request)
+                        if x['message'].get('attachments'):
+                            for att in x['message'].get('attachments'):
+                                pass
+                                # bot.send_attachment_url(recipient_id, att['type'], att['payload']['url'])
+                    elif x.get('postback').get('payload')=='USER_DEFINED_PAYLOAD':
+                        message = messages.Message(text='Hello World')
+                        request = messages.MessageRequest(recipient, message)
+                        messenger.send(request)
+                        pass
+        except Exception, e:
+            print e.message
+        return HttpResponse()
 
 
 # class fb_senderView(generic.View):
