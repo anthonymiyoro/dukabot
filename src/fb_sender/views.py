@@ -40,9 +40,8 @@ def webhook(request):
             return HttpResponse(request.GET['hub.challenge'])
         else:
             return HttpResponse('Error, invalid token')
-
-    if request.POST:
-        output = json.loads(request.body)
+    try:
+        output = json.loads(request.body.decode('utf-8'))
         print output
         try:
             for event in output['entry']:
@@ -63,14 +62,16 @@ def webhook(request):
                             for att in x['message'].get('attachments'):
                                 pass
                                 # bot.send_attachment_url(recipient_id, att['type'], att['payload']['url'])
-                    elif x.get('postback').get('payload')=='USER_DEFINED_PAYLOAD':
+                    elif x.get('postback').get('payload') == 'USER_DEFINED_PAYLOAD':
                         message = messages.Message(text='Hello World')
                         request = messages.MessageRequest(recipient, message)
                         messenger.send(request)
                         pass
         except Exception, e:
             print e.message
-        return HttpResponse()
+    except Exception, e:
+        print e
+    return HttpResponse()
 
 
 # class fb_senderView(generic.View):
