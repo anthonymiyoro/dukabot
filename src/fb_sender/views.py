@@ -33,6 +33,25 @@ template = templates.ButtonTemplate(
 attachment = attachments.TemplateAttachment(template=template)
 
 
+# # Send button template 2
+# web_button2 = elements.WebUrlButton(
+#   title="I'm a buyer",
+#   url='https://petersapparel.parseapp.com'
+# )
+# postback_button2 = elements.PostbackButton(
+#   title='I have something to sell',
+#   payload='USER_DEFINED_PAYLOAD'
+# )
+
+# template2 = templates.ButtonTemplate(
+#   text='Which are you?',
+#   buttons=[
+#       web_button2, postback_button2
+#   ]
+# )
+# # attachment2 = attachments.TemplateAttachment(template=template2)
+
+
 @csrf_exempt
 def webhook(request):
     if request.GET:
@@ -61,14 +80,14 @@ def webhook(request):
                                 title='Start chatting',
                                 payload='USER_DEFINED_PAYLOAD'
                             )
-                            postback_button = elements.PostbackButton(
+                            postback_button1 = elements.PostbackButton(
                                 title='Start chatting3',
                                 payload='USER_DEFINED_PAYLOAD1'
                             )
                             template = templates.ButtonTemplate(
-                                text=':smiley:',
+                                text='What do you want to do next?',
                                 buttons=[
-                                    web_button, postback_button
+                                    postback_button, postback_button1
                                 ]
                             )
                             attachment = attachments.TemplateAttachment(template=template)
