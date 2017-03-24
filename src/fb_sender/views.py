@@ -77,11 +77,11 @@ def webhook(request):
                             request = messages.MessageRequest(recipient, message)
                             messenger.send(request)
                             postback_button = elements.PostbackButton(
-                                title='Start chatting',
+                                title='I am a buyer',
                                 payload='USER_DEFINED_PAYLOAD'
                             )
                             postback_button1 = elements.PostbackButton(
-                                title='Start chatting3',
+                                title='I want to sell',
                                 payload='USER_DEFINED_PAYLOAD1'
                             )
                             template = templates.ButtonTemplate(
