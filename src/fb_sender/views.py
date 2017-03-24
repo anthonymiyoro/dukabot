@@ -16,46 +16,25 @@ messenger = MessengerClient(access_token=ACCESS_TOKEN)
 
 # Send button template
 web_button = elements.WebUrlButton(
-   title='Show website',
-   url='https://petersapparel.parseapp.com'
+    title='Show website',
+    url='https://petersapparel.parseapp.com'
 )
 postback_button = elements.PostbackButton(
-   title='Start chatting',
-   payload='USER_DEFINED_PAYLOAD'
+    title='Start chatting',
+    payload='USER_DEFINED_PAYLOAD'
 )
-
 template = templates.ButtonTemplate(
-   text='What do you want to do next?',
-   buttons=[
-       web_button, postback_button
-   ]
+    text='What do you want to do next?',
+    buttons=[
+        web_button, postback_button
+    ]
 )
-
-attachment = attachments.TemplateAttachment(template=template)
-
-# # Send button template 2
-# web_button2 = elements.WebUrlButton(
-#   title="I'm a buyer",
-#   url='https://petersapparel.parseapp.com'
-# )
-# postback_button2 = elements.PostbackButton(
-#   title='I have something to sell',
-#   payload='USER_DEFINED_PAYLOAD'
-# )
-
-# template = templates.ButtonTemplate(
-#   text='Which are you?',
-#   buttons=[
-#       web_button2, postback_button2
-#   ]
-# )
 
 attachment = attachments.TemplateAttachment(template=template)
 
 
 @csrf_exempt
 def webhook(request):
-
     if request.GET:
         if request.GET['hub.verify_token'] == '555777':
             return HttpResponse(request.GET['hub.challenge'])
@@ -74,14 +53,28 @@ def webhook(request):
                         # collect text
                         if x['message'].get('text'):
                             message_text = x['message']['text']
-                        # ask if they want to buy something
+                            # ask if they want to buy something
                             message = messages.Message(text='Hello, do you wish to buy or sell a product?')
                             request = messages.MessageRequest(recipient, message)
                             messenger.send(request)
-                            if message_text == 'hi':
-                                message = messages.Message(attachment=attachment)
-                                request = messages.MessageRequest(recipient, message)
-                                messenger.send(request)
+                            postback_button = elements.PostbackButton(
+                                title='Start chatting',
+                                payload='USER_DEFINED_PAYLOAD'
+                            )
+                            postback_button = elements.PostbackButton(
+                                title='Start chatting3',
+                                payload='USER_DEFINED_PAYLOAD1'
+                            )
+                            template = templates.ButtonTemplate(
+                                text=':smiley:',
+                                buttons=[
+                                    web_button, postback_button
+                                ]
+                            )
+                            attachment = attachments.TemplateAttachment(template=template)
+                            message = messages.Message(attachment=attachment)
+                            request = messages.MessageRequest(recipient, message)
+                            messenger.send(request)
                         if x['message'].get('attachments'):
                             for att in x['message'].get('attachments'):
                                 pass
@@ -90,9 +83,14 @@ def webhook(request):
                         request = messages.MessageRequest(recipient, message)
                         messenger.send(request)
                         pass
+                    elif x.get('postback').get('payload') == 'USER_DEFINED_PAYLOAD1':
+                        message = messages.Message(text='New Message')
+                        request = messages.MessageRequest(recipient, message)
+                        messenger.send(request)
+                        pass
+
         except Exception, e:
             print e.message
     except Exception, e:
         print e
     return HttpResponse()
-
