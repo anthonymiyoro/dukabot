@@ -271,7 +271,7 @@ def buy(sender_msisdn, recipient_msisdn):
     response = requests.post(url=url, headers=headers, data=json.dumps(payload))
     return response
 
-ACCESS_TOKEN = "EAADWobK94kQBAOzjAWQc1UtFiy2vqZA1J3hRvLgp9auwM3EEhBC9l8F3YC14hK8R8sZCSdYAOTxRkSn52A4LlYoYZAZBF1bAygqb9ZCgpTAZC0EfK9Uxpo9K4GjKF0tE8t39Lds2zq7R8ypqfvLhSBHNVwp0ZCWgyKgZCsLMZAgHCTgZDZD"
+ACCESS_TOKEN = ""
 messenger = MessengerClient(access_token=ACCESS_TOKEN)
 
 # Send button template
@@ -315,7 +315,7 @@ attachment = attachments.TemplateAttachment(template=template)
 @csrf_exempt
 def webhook(request):
     if request.GET:
-        if request.GET['hub.verify_token'] == '555777':
+        if request.GET['hub.verify_token'] == '':
             return HttpResponse(request.GET['hub.challenge'])
         else:
             return HttpResponse('Error, invalid token')
